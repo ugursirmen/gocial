@@ -1,0 +1,57 @@
+--------------------Required APIs-----------------------------
+
+POST /users -> register/create the requested user
+{
+    "username":"",
+    "email":"",
+    "password":""    
+}
+
+PATCH /users/{userId} -> update user's info
+{
+    "firstName" : "",
+    "lastName" : "",
+    "bio" : "",
+    "username": ""
+}
+
+PATCH /users/{userId}/pp -> Create with a pp by stream multiPartFormData
+
+PATCH /users/{userId}/password
+{
+    "oldPassword" : "",
+    "newPassword" : ""
+}
+
+GET /users/{userId}
+GET /users/{userId}/follows
+GET /users/{userId}/followers
+GET /users/{userId}/posts
+GET /users/{userId}/posts/{postId}
+
+GET /posts -> this is for newsfeed. Get active user's feeds with follows posts
+POST /posts -> Create with an image by stream multiPartFormData. Create it with active userId (maybe get it by token)
+{
+    "description":""
+}
+DELETE /posts/{postId} -> Soft delete. Sing it as IsDeleted true and/or move to in archive with summrized data maybe, maybe not.
+
+----------------------------Tables---------------------------
+
+User:
+id
+username
+email
+password
+firstName
+lastName
+bio
+profilePicture (Url or binary data)
+createdAt
+
+Post:
+id
+userId
+description
+image (Url or binary data)
+craetedAt
