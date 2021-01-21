@@ -2,33 +2,50 @@ package main
 
 import "time"
 
-type UserModel struct {
-	Id        int       `json:"id"`
-	Username  string    `json:"username"`
-	FullName  string    `json:"fullName"`
-	Followed  bool      `json:"followed"`
-	CreatedAt time.Time `json:"createdAt"`
+type UserDto struct {
+	ID             int       `json:"id"`
+	Username       string    `json:"username"`
+	FullName       string    `json:"fullName"`
+	Followed       bool      `json:"followed"`
+	CreatedAt      time.Time `json:"createdAt"`
+	ProfilePicture string    `json:"pp"`
 }
 
-type PostModel struct {
-	Id          int       `json:"id"`
+type PostDto struct {
+	ID          int       `json:"id"`
 	Description string    `json:"description"`
 	Image       string    `json:"image"`
 	Liked       bool      `json:"liked"`
-	Owner       UserModel `json:"owner"`
+	Owner       UserDto   `json:"owner"`
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
 type CreateUserModel struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Username string
+	Email    string
+	Password string
 }
 
 type UpdateUserInfoModel struct {
-	UserId    int    `json:"userId"`
-	Username  string `json:"username"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Bio       string `json:"bio"`
+	UserID    int
+	Username  string
+	FirstName string
+	LastName  string
+	Bio       string
+}
+
+type UpdateUserPPModel struct {
+	UserID         int
+	ProfilePicture string
+}
+
+type UpdateUserPasswordModel struct {
+	UserID      int
+	OldPassword string
+	NewPassword string
+}
+
+type FollowUserModel struct {
+	UserID     int
+	FollowerID int
 }
