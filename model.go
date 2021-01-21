@@ -16,7 +16,7 @@ type PostDto struct {
 	Description string    `json:"description"`
 	Image       string    `json:"image"`
 	Liked       bool      `json:"liked"`
-	Owner       UserDto   `json:"owner"`
+	Owner       *UserDto  `json:"owner,omitempty"`
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
@@ -48,4 +48,15 @@ type UpdateUserPasswordModel struct {
 type FollowUserModel struct {
 	UserID     int
 	FollowerID int
+}
+
+type CreatePostModel struct {
+	UserID      int
+	Description string
+	Image       string
+}
+
+type LikePostModel struct {
+	UserID int
+	PostID int
 }

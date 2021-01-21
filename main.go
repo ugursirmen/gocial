@@ -10,6 +10,8 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 )
 
+var authenticatedUserID = 2 //todo build a tokenized login/logout mechanism
+
 var db *sql.DB
 
 var server = "localhost"

@@ -1,0 +1,14 @@
+{
+	"id": "8f1f5d37-4828-471e-afbd-538f0e57895e",
+	"name": "Gocial",
+	"values": [
+		{
+			"key": "host",
+			"value": "http://localhost:8888",
+			"enabled": true
+		}
+	],
+	"_postman_variable_scope": "environment",
+	"_postman_exported_at": "2021-01-21T21:29:31.562Z",
+	"_postman_exported_using": "Postman/7.36.1"
+}

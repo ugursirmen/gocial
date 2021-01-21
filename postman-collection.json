@@ -1,0 +1,370 @@
+{
+	"info": {
+		"_postman_id": "932bbf0d-a026-48b2-b393-92b1a6bd1d9f",
+		"name": "Gocial",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "create user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\":\"nukednoble\",\n    \"email\":\"ugurrr.sirmen@gmail.com\",\n    \"password\":\"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update user info",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"nukednoble\",\n    \"firstName\": \"Uğur\",\n    \"lastName\": \"Sirmen\",\n    \"bio\": \"story teller\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/15",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"15"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update user PP",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "pp",
+							"type": "file",
+							"src": "/Users/ugursirmen/Desktop/dev/gorcode/static/icon.ico"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/15/pp",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"15",
+						"pp"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update user password",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"oldPassword\":\"xxxxxx\",\n    \"newPassword\":\"123456\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/users/2/password",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"2",
+						"password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/15",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"15"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "follow user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/15/follow",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"15",
+						"follow"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unfollow user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/11/unfollow",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"11",
+						"unfollow"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user follows",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/2/follows",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"2",
+						"follows"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user followers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/14/followers",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"14",
+						"followers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "create post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "userId",
+							"value": "15",
+							"type": "text"
+						},
+						{
+							"key": "image",
+							"type": "file",
+							"src": "/Users/ugursirmen/Desktop/dev/gorcode/static/default.jpg"
+						},
+						{
+							"key": "description",
+							"value": "this is a post description 3",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/posts",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user posts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/users/2/posts",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"users",
+						"2",
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get posts (newsfeed)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/posts",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"posts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get post detail",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/posts/6",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"posts",
+						"6"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete post",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/posts/2",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"posts",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "like post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/posts/8/like",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"posts",
+						"8",
+						"like"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unlike post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{host}}/posts/8/unlike",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"posts",
+						"8",
+						"unlike"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

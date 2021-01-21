@@ -77,58 +77,58 @@ var routes = Routes{
 		"/users/{userId}/unfollow",
 		UnfollowUserHandler,
 	},
-	// Route{
-	// 	"GetUserFollows",
-	// 	"GET",
-	// 	"/users/{userId}/follows",
-	// 	GetUserFollowsHandler,
-	// },
-	// Route{
-	// 	"GetUserFollowers",
-	// 	"GET",
-	// 	"/users/{userId}/followers",
-	// 	GetUserFollowersHandler,
-	// },
-	// Route{
-	// 	"GetUserPosts",
-	// 	"GET",
-	// 	"/users/{userId}/posts",
-	// 	GetUserPostsHandler,
-	// },
-	// Route{
-	// 	"CreatePost",
-	// 	"POST",
-	// 	"/posts",
-	// 	CreatePostHandler,
-	// },
-	// Route{
-	// 	"GetPosts",
-	// 	"GET",
-	// 	"/posts",
-	// 	GetPostsHandler,
-	// },
-	// Route{
-	// 	"GetPostDetail",
-	// 	"GET",
-	// 	"/posts/{postId}",
-	// 	GetPostDetailHandler,
-	// }
-	// Route{
-	// 	"DeletePost",
-	// 	"DELETE",
-	// 	"/posts/{postId}",
-	// 	DeletePostHandler,
-	// },
-	// Route{
-	// 	"LikePost",
-	// 	"POST",
-	// 	"/posts/{postId}/like",
-	// 	LikePostHandler,
-	// },
-	// Route{
-	// 	"UnLikePost",
-	// 	"POST",
-	// 	"/posts/{postId}/unlike",
-	// 	UnLikePostHandler,
-	// }
+	Route{
+		"GetUserFollows",
+		"GET",
+		"/users/{userId}/follows",
+		GetUserFollowsHandler,
+	},
+	Route{
+		"GetUserFollowers",
+		"GET",
+		"/users/{userId}/followers",
+		GetUserFollowersHandler,
+	},
+	Route{
+		"CreatePost",
+		"POST",
+		"/posts",
+		CreatePostHandler,
+	},
+	Route{
+		"GetUserPosts",
+		"GET",
+		"/users/{userId}/posts",
+		GetUserPostsHandler,
+	},
+	Route{
+		"GetPosts",
+		"GET",
+		"/posts",
+		GetPostsHandler,
+	},
+	Route{
+		"GetPostDetail",
+		"GET",
+		"/posts/{postId}",
+		GetPostDetailHandler,
+	},
+	Route{
+		"DeletePost",
+		"DELETE",
+		"/posts/{postId}",
+		DeletePostHandler,
+	},
+	Route{
+		"LikePost",
+		"POST",
+		"/posts/{postId}/like",
+		LikePostHandler,
+	},
+	Route{
+		"UnLikePost",
+		"POST",
+		"/posts/{postId}/unlike",
+		UnlikePostHandler,
+	},
 }
