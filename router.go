@@ -102,10 +102,22 @@ var routes = Routes{
 		GetUserPostsHandler,
 	},
 	Route{
-		"GetPosts",
+		"Newsfeed",
 		"GET",
-		"/posts",
-		GetPostsHandler,
+		"/newsfeed",
+		NewsfeedHandler,
+	},
+	Route{
+		"GetPostsArbitrary",
+		"POST",
+		"/posts/arbitrary",
+		GetPostsArbitraryHandler,
+	},
+	Route{
+		"GetPostsArbitrary",
+		"POST",
+		"/posts/arbitrary/non-relational",
+		GetPostsArbitraryNonRelationalHandler,
 	},
 	Route{
 		"GetPostDetail",

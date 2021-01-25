@@ -20,12 +20,8 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = CreateUser(model)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }
 
 func UpdateUserInfoHandler(w http.ResponseWriter, r *http.Request) {
@@ -39,12 +35,8 @@ func UpdateUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	model.UserID, err = strconv.Atoi(mux.Vars(r)["userId"])
 	err = UpdateUserInfo(model)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }
 
 func UpdateUserPPHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,12 +62,8 @@ func UpdateUserPPHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = UpdateUserPP(model)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }
 
 func UpdateUserPasswordHandler(w http.ResponseWriter, r *http.Request) {
@@ -89,12 +77,8 @@ func UpdateUserPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	model.UserID, err = strconv.Atoi(mux.Vars(r)["userId"])
 	err = UpdateUserPassword(model)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }
 
 func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
@@ -103,14 +87,8 @@ func GetUserInfoHandler(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(mux.Vars(r)["userId"])
 	user, err := GetUserInfo(userID)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(user)
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, &ResponseData{nil, nil, &user, nil}}
+	rw.GenerateResponse()
 }
 
 func FollowUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -123,12 +101,8 @@ func FollowUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = FollowUser(model)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }
 
 func UnfollowUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -141,12 +115,8 @@ func UnfollowUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = UnfollowUser(model)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }
 
 func GetUserFollowsHandler(w http.ResponseWriter, r *http.Request) {
@@ -155,14 +125,8 @@ func GetUserFollowsHandler(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(mux.Vars(r)["userId"])
 	users, err := GetUserFollows(userID)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(users)
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, &ResponseData{nil, nil, nil, &users}}
+	rw.GenerateResponse()
 }
 
 func GetUserFollowersHandler(w http.ResponseWriter, r *http.Request) {
@@ -171,14 +135,8 @@ func GetUserFollowersHandler(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(mux.Vars(r)["userId"])
 	users, err := GetUserFollowers(userID)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(users)
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, &ResponseData{nil, nil, nil, &users}}
+	rw.GenerateResponse()
 }
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -206,12 +164,8 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = CreatePost(model)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }
 
 func GetUserPostsHandler(w http.ResponseWriter, r *http.Request) {
@@ -220,36 +174,74 @@ func GetUserPostsHandler(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(mux.Vars(r)["userId"])
 	posts, err := GetUserPosts(userID)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(posts)
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, &ResponseData{nil, &posts, nil, nil}}
+	rw.GenerateResponse()
 }
 
-func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
+func GetPostsArbitraryHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 
-	idParams := r.URL.Query()["id"]
-	var ids []int
-	for i := 0; i < len(idParams); i++ {
-		id, _ := strconv.Atoi(idParams[i])
-		ids = append(ids, id)
+	decoder := json.NewDecoder(r.Body)
+	var model PostsArbitraryModel
+	err = decoder.Decode(&model)
+
+	posts, err := GetPostsArbitrary(model)
+
+	rw := &Response{w, err, &ResponseData{nil, &posts, nil, nil}}
+	rw.GenerateResponse()
+}
+
+func GetPostsArbitraryNonRelationalHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	decoder := json.NewDecoder(r.Body)
+	var model PostsArbitraryModel
+	err = decoder.Decode(&model)
+
+	userEntity, err := GetUserInfo(model.UserID)
+
+	postEntities, err := GetPostsByIds(model.PostIDs)
+
+	var posts []PostDto
+
+	if len(postEntities) > 0 {
+		for _, postEntity := range postEntities {
+
+			liked, _ := IsLiked(userEntity.ID, postEntity.ID)
+
+			post := PostDto{
+				ID:          postEntity.ID,
+				Description: postEntity.Description,
+				Image:       postEntity.Image,
+				CreatedAt:   postEntity.CreatedAt,
+				Liked:       liked,
+			}
+
+			followed, _ := IsFollowed(postEntity.UserID, model.UserID)
+
+			post.Owner = &UserDto{
+				ID:             userEntity.ID,
+				Username:       userEntity.Username,
+				FullName:       userEntity.FullName,
+				ProfilePicture: userEntity.ProfilePicture,
+				Followed:       followed,
+			}
+
+			posts = append(posts, post)
+		}
 	}
 
-	posts, err := GetPosts(authenticatedUserID, ids)
+	rw := &Response{w, err, &ResponseData{nil, &posts, nil, nil}}
+	rw.GenerateResponse()
+}
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(posts)
-		w.WriteHeader(http.StatusOK)
-	}
+func NewsfeedHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	posts, err := Newsfeed(authenticatedUserID)
+
+	rw := &Response{w, err, &ResponseData{nil, &posts, nil, nil}}
+	rw.GenerateResponse()
 }
 
 func GetPostDetailHandler(w http.ResponseWriter, r *http.Request) {
@@ -258,29 +250,18 @@ func GetPostDetailHandler(w http.ResponseWriter, r *http.Request) {
 	postID, err := strconv.Atoi(mux.Vars(r)["postId"])
 	post, err := GetPostDetail(postID)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(post)
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, &ResponseData{post, nil, nil, nil}}
+	rw.GenerateResponse()
 }
 
 func DeletePostHandler(w http.ResponseWriter, r *http.Request) {
-
 	var err error
 
 	postID, err := strconv.Atoi(mux.Vars(r)["postId"])
 	err = DeletePost(postID)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }
 
 func LikePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -292,12 +273,8 @@ func LikePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = LikePost(model)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }
 
 func UnlikePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -309,10 +286,6 @@ func UnlikePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = UnlikePost(model)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-	} else {
-		w.WriteHeader(http.StatusOK)
-	}
+	rw := &Response{w, err, nil}
+	rw.GenerateResponse()
 }

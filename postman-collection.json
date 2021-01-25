@@ -12,7 +12,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"username\":\"nukednoble\",\n    \"email\":\"ugurrr.sirmen@gmail.com\",\n    \"password\":\"123456\"\n}",
+					"raw": "{\n    \"username\":\"test2\",\n    \"email\":\"test2@gmail.com\",\n    \"password\":\"123456\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -201,13 +201,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/users/14/followers",
+					"raw": "{{host}}/users/15/followers",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
 						"users",
-						"14",
+						"15",
 						"followers"
 					]
 				}
@@ -276,17 +276,72 @@
 			"response": []
 		},
 		{
-			"name": "get posts (newsfeed)",
+			"name": "newsfeed",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{host}}/posts",
+					"raw": "{{host}}/newsfeed",
 					"host": [
 						"{{host}}"
 					],
 					"path": [
-						"posts"
+						"newsfeed"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get posts arbitrary",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": 2,\n    \"postIds\": [\n        1,2,2,2,2,2,2,3,5,4,6,7,98,234\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/posts/arbitrary",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"posts",
+						"arbitrary"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get posts arbitrary non-relational",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": 2,\n    \"postIds\": [\n        1,2,2,2,2,2,2,3,5,4,6,7,8,98,234\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}/posts/arbitrary/non-relational",
+					"host": [
+						"{{host}}"
+					],
+					"path": [
+						"posts",
+						"arbitrary",
+						"non-relational"
 					]
 				}
 			},

@@ -22,6 +22,6 @@
 
 ## DB Schema
 
-![alt text](https://github.com/ugursirmen/gocial/blob/main/gocial-schema.png)
+![db schema](gocial-schema.png)
 
 > todo : auth guard 

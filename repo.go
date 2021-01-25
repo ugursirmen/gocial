@@ -13,12 +13,7 @@ func CreateUser(model CreateUserModel) error {
 	ctx := context.Background()
 	var err error
 
-	tsql := `
-      INSERT INTO Users (Username, Email, Password, CreatedAt) VALUES (@Username, @Email, @Password, @CreatedAt);
-      select isNull(SCOPE_IDENTITY(), -1);
-    `
-
-	stmt, err := db.Prepare(tsql)
+	stmt, err := db.Prepare("EXEC CreateUser @Username, @Email, @Password, @CreatedAt")
 	if err != nil {
 		return err
 	}
@@ -48,16 +43,14 @@ func UpdateUserInfo(model UpdateUserInfoModel) error {
 	ctx := context.Background()
 	var err error
 
-	tsql := fmt.Sprintf("UPDATE Users SET Username = @Username, FirstName = @FirstName, LastName = @LastName, Bio = @Bio WHERE Id = @Id")
-
 	result, err := db.ExecContext(
 		ctx,
-		tsql,
+		"EXEC UpdateUserInfo @Username, @FirstName, @LastName, @Bio, @UserId",
 		sql.Named("Username", model.Username),
 		sql.Named("FirstName", model.FirstName),
 		sql.Named("LastName", model.LastName),
 		sql.Named("Bio", model.Bio),
-		sql.Named("Id", model.UserID))
+		sql.Named("UserId", model.UserID))
 
 	effectedRows, err := result.RowsAffected()
 
@@ -76,13 +69,11 @@ func UpdateUserPP(model UpdateUserPPModel) error {
 	ctx := context.Background()
 	var err error
 
-	tsql := fmt.Sprintf("UPDATE Users SET ProfilePicture = @ProfilePicture WHERE Id = @Id")
-
 	result, err := db.ExecContext(
 		ctx,
-		tsql,
+		"EXEC UpdateUserPP @ProfilePicture, @UserId",
 		sql.Named("ProfilePicture", model.ProfilePicture),
-		sql.Named("Id", model.UserID))
+		sql.Named("UserId", model.UserID))
 
 	effectedRows, err := result.RowsAffected()
 
@@ -101,35 +92,12 @@ func UpdateUserPassword(model UpdateUserPasswordModel) error {
 	ctx := context.Background()
 	var err error
 
-	rows, err := db.QueryContext(ctx, "SELECT Password FROM Users where Id = @Id", sql.Named("Id", model.UserID))
-
-	if err != nil {
-		return err
-	}
-
-	defer rows.Close()
-
-	var password string
-
-	for rows.Next() {
-
-		err := rows.Scan(&password)
-		if err != nil {
-			return err
-		}
-	}
-
-	if password != model.OldPassword {
-		return errors.New("Old-password mismatch")
-	}
-
-	tsql := fmt.Sprintf("UPDATE Users SET Password = @Password WHERE Id = @Id")
-
 	result, err := db.ExecContext(
 		ctx,
-		tsql,
-		sql.Named("Password", model.NewPassword),
-		sql.Named("Id", model.UserID))
+		"EXEC UpdateUserPassword @OldPassword, @NewPassword, @UserId",
+		sql.Named("OldPassword", model.OldPassword),
+		sql.Named("NewPassword", model.NewPassword),
+		sql.Named("UserId", model.UserID))
 
 	effectedRows, err := result.RowsAffected()
 
@@ -150,7 +118,7 @@ func GetUserInfo(id int) (UserDto, error) {
 	var err error
 	var user UserDto
 
-	rows, err := db.QueryContext(ctx, "SELECT Username,Email,COALESCE(FirstName,''),COALESCE(LastName,''),COALESCE(ProfilePicture,''),CreatedAt FROM Users where Id = @Id", sql.Named("Id", id))
+	rows, err := db.QueryContext(ctx, "EXEC GetUserInfo @UserId", sql.Named("UserId", id))
 
 	if err != nil {
 		return user, err
@@ -173,7 +141,7 @@ func GetUserInfo(id int) (UserDto, error) {
 	if firstName != "" && lastName != "" {
 		user.FullName = firstName + " " + lastName
 	}
-	user.CreatedAt = createdAt
+
 	user.ProfilePicture = pp
 	user.Followed = true
 
@@ -184,11 +152,7 @@ func FollowUser(model FollowUserModel) error {
 	ctx := context.Background()
 	var err error
 
-	tsql := `
-      INSERT INTO Followers (UserId, FollowerId) VALUES (@UserId, @FollowerId)
-    `
-
-	stmt, err := db.Prepare(tsql)
+	stmt, err := db.Prepare("EXEC FollowUser @FollowerId, @UserId")
 	if err != nil {
 		return err
 	}
@@ -211,11 +175,9 @@ func UnfollowUser(model FollowUserModel) error {
 	ctx := context.Background()
 	var err error
 
-	tsql := fmt.Sprintf("DELETE FROM Followers WHERE UserId = @UserId AND FollowerId = @FollowerId")
-
 	result, err := db.ExecContext(
 		ctx,
-		tsql,
+		"EXEC UnfollowUser @FollowerId, @UserId",
 		sql.Named("UserId", model.UserID),
 		sql.Named("FollowerId", model.FollowerID))
 
@@ -239,7 +201,7 @@ func GetUserFollows(id int) ([]UserDto, error) {
 
 	var users []UserDto
 
-	rows, err := db.QueryContext(ctx, "select Id,Username,Email,COALESCE(FirstName,''),COALESCE(LastName,''),COALESCE(ProfilePicture,''),CreatedAt from Followers LEFT JOIN Users U on U.Id = Followers.UserId WHERE FollowerId = @FollowerId ORDER BY CreatedAt DESC", sql.Named("FollowerId", id))
+	rows, err := db.QueryContext(ctx, "EXEC GetUserFollows @FollowerId", sql.Named("FollowerId", id))
 
 	if err != nil {
 		return nil, err
@@ -265,7 +227,8 @@ func GetUserFollows(id int) ([]UserDto, error) {
 			user.FullName = firstName + " " + lastName
 		}
 		user.ProfilePicture = pp
-		user.CreatedAt = createdAt
+		user.CreatedAt = &createdAt
+		user.Followed = true
 
 		users = append(users, user)
 	}
@@ -280,7 +243,7 @@ func GetUserFollowers(id int) ([]UserDto, error) {
 
 	var users []UserDto
 
-	rows, err := db.QueryContext(ctx, "select Id,Username,Email,COALESCE(FirstName,''),COALESCE(LastName,''),COALESCE(ProfilePicture,''),CreatedAt from Followers LEFT JOIN Users U on U.Id = Followers.FollowerId WHERE UserId = @UserId ORDER BY CreatedAt DESC", sql.Named("UserId", id))
+	rows, err := db.QueryContext(ctx, "EXEC GetUserFollowers @UserId", sql.Named("UserId", id))
 
 	if err != nil {
 		return nil, err
@@ -293,8 +256,9 @@ func GetUserFollowers(id int) ([]UserDto, error) {
 		var id int
 		var username, email, firstName, lastName, pp string
 		var createdAt time.Time
+		var followed bool
 
-		err := rows.Scan(&id, &email, &username, &firstName, &lastName, &pp, &createdAt)
+		err := rows.Scan(&id, &email, &username, &firstName, &lastName, &pp, &createdAt, &followed)
 		if err != nil {
 			return nil, err
 		}
@@ -306,7 +270,8 @@ func GetUserFollowers(id int) ([]UserDto, error) {
 			user.FullName = firstName + " " + lastName
 		}
 		user.ProfilePicture = pp
-		user.CreatedAt = createdAt
+		user.CreatedAt = &createdAt
+		user.Followed = followed
 
 		users = append(users, user)
 	}
@@ -318,12 +283,7 @@ func CreatePost(model CreatePostModel) error {
 	ctx := context.Background()
 	var err error
 
-	tsql := `
-      INSERT INTO Posts (UserId,Description,Image,CreatedAt) VALUES (@UserId, @Description, @Image, @CreatedAt);
-      select isNull(SCOPE_IDENTITY(), -1);
-    `
-
-	stmt, err := db.Prepare(tsql)
+	stmt, err := db.Prepare("EXEC CreatePost @UserId, @Description, @Image, @CreatedAt")
 	if err != nil {
 		return err
 	}
@@ -356,7 +316,7 @@ func GetUserPosts(id int) ([]PostDto, error) {
 
 	var posts []PostDto
 
-	rows, err := db.QueryContext(ctx, "SELECT Id,COALESCE(Description,''),COALESCE(Image,''),COALESCE(IsDeleted, 0),CreatedAt FROM Posts WHERE UserId = @UserId ORDER BY CreatedAt DESC", sql.Named("UserId", id))
+	rows, err := db.QueryContext(ctx, "EXEC GetUserPosts @UserId", sql.Named("UserId", id))
 
 	if err != nil {
 		return nil, err
@@ -370,7 +330,7 @@ func GetUserPosts(id int) ([]PostDto, error) {
 
 		var deleted bool
 
-		err := rows.Scan(&post.ID, &post.Description, &post.Image, &deleted, &post.CreatedAt)
+		err := rows.Scan(&post.ID, &post.Description, &post.Image, &deleted, &post.CreatedAt, &post.Liked)
 		if err != nil {
 			return nil, err
 		}
@@ -383,23 +343,21 @@ func GetUserPosts(id int) ([]PostDto, error) {
 	return posts, nil
 }
 
-func GetPosts(userId int, postIds []int) ([]PostDto, error) {
+func GetPostsArbitrary(model PostsArbitraryModel) ([]PostDto, error) {
 
 	ctx := context.Background()
 	var err error
 
 	var posts []PostDto
 
-	var query = "select U.Id,Username,Email,COALESCE(FirstName,''),COALESCE(LastName,''),COALESCE(ProfilePicture,''),P.Id ,COALESCE(Description,''),COALESCE(Image,''),COALESCE(IsDeleted, 0),P.CreatedAt from Followers LEFT JOIN Users U on U.Id = Followers.UserId LEFT JOIN Posts P on U.Id = P.UserId WHERE P.Id is not null and FollowerId = @FollowerId ORDER BY CreatedAt DESC"
+	uniqueSlice := unique(model.PostIDs)
 
-	if len(postIds) > 0 {
+	postIds := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(uniqueSlice)), ","), "[]")
 
-		postIdsString := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(postIds)), ","), "[]")
-
-		query = "select U.Id,Username,Email,COALESCE(FirstName,''),COALESCE(LastName,''),COALESCE(ProfilePicture,''),P.Id ,COALESCE(Description,''),COALESCE(Image,''),COALESCE(IsDeleted, 0),P.CreatedAt from Followers LEFT JOIN Users U on U.Id = Followers.UserId LEFT JOIN Posts P on U.Id = P.UserId WHERE P.Id is not null and P.Id IN (" + postIdsString + ") AND FollowerId = @FollowerId"
-	}
-
-	rows, err := db.QueryContext(ctx, query, sql.Named("FollowerId", userId))
+	rows, err := db.QueryContext(
+		ctx, "EXEC GetPostsArbitrary @UserId, @Posts",
+		sql.Named("UserId", model.UserID),
+		sql.Named("Posts", postIds))
 
 	if err != nil {
 		return nil, err
@@ -413,9 +371,9 @@ func GetPosts(userId int, postIds []int) ([]PostDto, error) {
 		var createdAt time.Time
 		var userID, postID int
 
-		var deleted bool
+		var deleted, followed, liked bool
 
-		err := rows.Scan(&userID, &username, &email, &firstName, &lastName, &pp, &postID, &description, &image, &deleted, &createdAt)
+		err := rows.Scan(&userID, &username, &email, &firstName, &lastName, &pp, &postID, &description, &image, &deleted, &createdAt, &followed, &liked)
 		if err != nil {
 			return nil, err
 		}
@@ -426,7 +384,7 @@ func GetPosts(userId int, postIds []int) ([]PostDto, error) {
 		post.CreatedAt = createdAt
 		post.Description = description
 		post.Image = image
-		post.Liked = false
+		post.Liked = liked
 
 		var owner UserDto
 
@@ -436,13 +394,133 @@ func GetPosts(userId int, postIds []int) ([]PostDto, error) {
 			owner.FullName = firstName + " " + lastName
 		}
 		owner.ProfilePicture = pp
+		owner.Followed = followed
 
 		post.Owner = &owner
 
 		if !deleted {
 			posts = append(posts, post)
 		} else {
-			posts = append(posts, PostDto{})
+			posts = append(posts, nil...)
+		}
+	}
+
+	return posts, nil
+}
+
+func GetPostsByIds(postIds []int) ([]PostEntity, error) {
+	ctx := context.Background()
+	var err error
+
+	var posts []PostEntity
+
+	uniqueSlice := unique(postIds)
+
+	postIdsString := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(uniqueSlice)), ","), "[]")
+
+	rows, err := db.QueryContext(
+		ctx, "SELECT Id,COALESCE(Description,''),COALESCE(Image,''),COALESCE(IsDeleted,0),CreatedAt,UserId FROM Posts WHERE Id IN ("+postIdsString+")")
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var postEntity PostEntity
+
+		err := rows.Scan(&postEntity.ID, &postEntity.Description, &postEntity.Image, &postEntity.Deleted, &postEntity.CreatedAt, &postEntity.UserID)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, postEntity)
+	}
+
+	return posts, nil
+}
+
+func GetUserById(userId int) (UserEntity, error) {
+	ctx := context.Background()
+	var err error
+
+	var user UserEntity
+
+	rows, err := db.QueryContext(
+		ctx, "SELECT Id,Username,FirstName,LastName,Bio,ProfilePicture FROM Users Where Id = @UserId",
+		sql.Named("UserId", userId))
+
+	if err != nil {
+		return user, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		err := rows.Scan(&user.ID, &user.Username, &user.FirstName, &user.LastName, &user.Bio, &user.ProfilePicture)
+		if err != nil {
+			return user, err
+		}
+	}
+
+	return user, nil
+}
+
+func Newsfeed(userId int) ([]PostDto, error) {
+
+	ctx := context.Background()
+	var err error
+
+	var posts []PostDto
+
+	rows, err := db.QueryContext(ctx, "EXEC Newsfeed @UserId", sql.Named("UserId", userId))
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var username, email, firstName, lastName, pp, description, image string
+		var createdAt time.Time
+		var userID, postID int
+
+		var deleted, followed, liked bool
+
+		err := rows.Scan(&userID, &username, &email, &firstName, &lastName, &pp, &postID, &description, &image, &deleted, &createdAt, &followed, &liked)
+		if err != nil {
+			return nil, err
+		}
+
+		var post PostDto
+
+		post.ID = postID
+		post.CreatedAt = createdAt
+		post.Description = description
+		post.Image = image
+		post.Liked = liked
+
+		var owner UserDto
+
+		owner.ID = userID
+		owner.Username = username
+		if firstName != "" && lastName != "" {
+			owner.FullName = firstName + " " + lastName
+		}
+		owner.ProfilePicture = pp
+		owner.Followed = followed
+
+		post.Owner = &owner
+
+		if !deleted {
+			posts = append(posts, post)
+		} else {
+			posts = append(posts, nil...)
 		}
 	}
 
@@ -456,7 +534,7 @@ func GetPostDetail(id int) (*PostDto, error) {
 
 	var post PostDto
 
-	rows, err := db.QueryContext(ctx, "select Posts.Id,COALESCE(Description,''),COALESCE(Image,''),COALESCE(IsDeleted,0),Posts.CreatedAt,UserId,Username,Email,COALESCE(FirstName,''),COALESCE(LastName,''),COALESCE(ProfilePicture,'') from Posts LEFT JOIN Users U on U.Id = Posts.UserId where Posts.Id = @PostId", sql.Named("PostId", id))
+	rows, err := db.QueryContext(ctx, "EXEC GetPostDetail @PostId", sql.Named("PostId", id))
 
 	if err != nil {
 		return nil, err
@@ -498,13 +576,10 @@ func DeletePost(id int) error {
 	ctx := context.Background()
 	var err error
 
-	tsql := fmt.Sprintf("UPDATE Posts SET IsDeleted = @IsDeleted WHERE Id = @Id")
-
 	result, err := db.ExecContext(
 		ctx,
-		tsql,
-		sql.Named("IsDeleted", 1),
-		sql.Named("Id", id))
+		"EXEC DeletePost @PostId",
+		sql.Named("PostId", id))
 
 	effectedRows, err := result.RowsAffected()
 
@@ -523,11 +598,7 @@ func LikePost(model LikePostModel) error {
 	ctx := context.Background()
 	var err error
 
-	tsql := `
-      INSERT INTO Likes (PostId, UserId) VALUES (@PostId, @UserId)
-    `
-
-	stmt, err := db.Prepare(tsql)
+	stmt, err := db.Prepare("EXEC LikePost @PostId, @UserId")
 	if err != nil {
 		return err
 	}
@@ -550,11 +621,9 @@ func UnlikePost(model LikePostModel) error {
 	ctx := context.Background()
 	var err error
 
-	tsql := fmt.Sprintf("DELETE FROM Likes WHERE PostId = @PostId AND UserId = @UserId")
-
 	result, err := db.ExecContext(
 		ctx,
-		tsql,
+		"EXEC UnlikePost @PostId, @UserId",
 		sql.Named("PostId", model.PostID),
 		sql.Named("UserId", model.UserID))
 
@@ -569,4 +638,73 @@ func UnlikePost(model LikePostModel) error {
 	}
 
 	return nil
+}
+
+func IsFollowed(userID int, followerID int) (bool, error) {
+
+	ctx := context.Background()
+	var err error
+	var followed bool
+
+	tsql := `
+	SELECT CASE WHEN EXISTS
+	(
+		SELECT * FROM Followers WHERE FollowerId = @FollowerId AND UserId = @UserId
+	)
+	THEN CAST(1 AS BIT)
+		ELSE CAST(0 AS BIT)
+	END
+    `
+
+	rows, err := db.QueryContext(ctx, tsql, sql.Named("UserId", userID), sql.Named("FollowerId", followerID))
+
+	if err != nil {
+		return followed, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&followed)
+		if err != nil {
+			return followed, err
+		}
+	}
+
+	return followed, nil
+}
+
+func IsLiked(userID int, postID int) (bool, error) {
+
+	ctx := context.Background()
+	var err error
+	var liked bool
+
+	tsql := `
+	SELECT CASE
+	WHEN EXISTS
+		(
+			SELECT * FROM Likes WHERE UserId = @UserId AND PostId = @PostId
+		)
+		THEN CAST(1 AS BIT)
+	ELSE CAST(0 AS BIT)
+	END
+    `
+
+	rows, err := db.QueryContext(ctx, tsql, sql.Named("UserId", userID), sql.Named("PostId", postID))
+
+	if err != nil {
+		return liked, err
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		err := rows.Scan(&liked)
+		if err != nil {
+			return liked, err
+		}
+	}
+
+	return liked, nil
 }
